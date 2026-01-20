@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_drug_registry/constants.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -9,118 +8,262 @@ class InformationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var theme = Theme.of(context);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.surfaceContainer,
+      backgroundColor: colorScheme.surface,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  'Информации',
-                  style: theme.textTheme.headlineLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: theme.primaryColor,
-                  ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 40),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildHeader(theme, colorScheme),
+              const SizedBox(height: 32),
+              _buildDisclaimerCard(theme, colorScheme),
+              const SizedBox(height: 24),
+              _buildInfoSection(theme, colorScheme),
+              const SizedBox(height: 32),
+              _buildActionButtons(theme, colorScheme),
+              const SizedBox(height: 48),
+              _buildFooter(theme, colorScheme),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(ThemeData theme, ColorScheme colorScheme) {
+    return Column(
+      children: [
+        Container(
+          width: 96,
+          height: 96,
+          child: Image.asset('assets/icon/icon.png', fit: BoxFit.contain),
+        ),
+        const SizedBox(height: 24),
+        Text(
+          'Регистар на лекови',
+          style: theme.textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.5,
+            color: colorScheme.onSurface,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 8),
+        FutureBuilder<PackageInfo>(
+          future: PackageInfo.fromPlatform(),
+          builder: (context, snapshot) {
+            final version = snapshot.data?.version ?? '...';
+            final buildNumber = snapshot.data?.buildNumber ?? '';
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                'v$version ($buildNumber)',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 0.5,
                 ),
-                const SizedBox(height: 8),
-                FutureBuilder(
-                  future: PackageInfo.fromPlatform(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    return Text(
-                      'Верзија ${snapshot.data?.version}+${snapshot.data?.buildNumber}',
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        color: theme.colorScheme.onSurface.withValues(
-                          alpha: 0.7,
-                        ),
-                      ),
-                    );
-                  },
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDisclaimerCard(ThemeData theme, ColorScheme colorScheme) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.info_outline_rounded,
+                size: 20,
+                color: colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Напомена',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
                 ),
-                const SizedBox(height: 30),
-                RichText(
-                  textAlign: TextAlign.justify,
-                  text: TextSpan(
-                    style: theme.textTheme.bodyLarge,
-                    children: [
-                      const TextSpan(text: 'Ова е '),
-                      TextSpan(
-                        text: 'неофицијална ',
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const TextSpan(
-                        text:
-                            'мобилна апликација за македонскиот регистар на лекови. ',
-                      ),
-                      const TextSpan(
-                        text:
-                            'Оваа апликација не е поврзана со ниту една државна институција и е направена од независно лице. Информациите за лековите и аптеките се влечат од ',
-                      ),
-                      TextSpan(
-                        text: Constants.lekoviUrl,
-                        recognizer:
-                            TapGestureRecognizer()
-                              ..onTap =
-                                  () => launchUrlString(Constants.lekoviUrl),
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          color: theme.primaryColor,
-                        ),
-                      ),
-                      const TextSpan(text: '.'),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 30),
-                OutlinedButton.icon(
-                  onPressed:
-                      () => launchUrlString('mailto:dimeskigj@gmail.com'),
-                  label: const Text(
-                    'Контакт',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  icon: const Icon(Icons.mail),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 16,
-                      horizontal: 20,
-                    ),
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
-                    ),
-                    side: BorderSide(color: theme.primaryColor),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                OutlinedButton.icon(
-                  onPressed: () => launchUrlString(Constants.privacyPolicyUrl),
-                  label: const Text(
-                    'Политика за приватност',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  icon: const Icon(Icons.launch),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 16,
-                      horizontal: 20,
-                    ),
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
-                    ),
-                    side: BorderSide(color: theme.primaryColor),
-                  ),
-                ),
-              ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Ова е неофицијална апликација. Податоците се преземаат од јавниот регистар, но развивачот не гарантира за нивната точност во секое време.',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+              height: 1.5,
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoSection(ThemeData theme, ColorScheme colorScheme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 8),
+          child: Text(
+            'ИЗВОР НА ПОДАТОЦИ',
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: colorScheme.outline,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.5,
+            ),
+          ),
+        ),
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => launchUrlString(Constants.lekoviUrl),
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.3,
+                ),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: colorScheme.outlineVariant),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Icons.storage_rounded,
+                      color: colorScheme.onPrimaryContainer,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'lekovi.zdravstvo.gov.mk',
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Официјален регистар на лекови',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.arrow_outward_rounded,
+                    size: 20,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionButtons(ThemeData theme, ColorScheme colorScheme) {
+    return Column(
+      children: [
+        _buildActionButton(
+          theme,
+          colorScheme,
+          label: 'Контактирајте нè',
+          icon: Icons.mail_outline,
+          onTap: () => launchUrlString('mailto:contact@dimeski.net'),
+        ),
+        const SizedBox(height: 12),
+        _buildActionButton(
+          theme,
+          colorScheme,
+          label: 'Политика за приватност',
+          icon: Icons.privacy_tip_outlined,
+          onTap: () => launchUrlString(Constants.privacyPolicyUrl),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionButton(
+    ThemeData theme,
+    ColorScheme colorScheme, {
+    required String label,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return OutlinedButton(
+      onPressed: onTap,
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+        side: BorderSide(color: colorScheme.outlineVariant),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        foregroundColor: colorScheme.onSurface,
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: colorScheme.primary),
+          const SizedBox(width: 12),
+          Text(
+            label,
+            style: theme.textTheme.labelLarge?.copyWith(fontSize: 16),
+          ),
+          const Spacer(),
+          Icon(
+            Icons.chevron_right,
+            size: 20,
+            color: colorScheme.onSurfaceVariant,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFooter(ThemeData theme, ColorScheme colorScheme) {
+    return Center(
+      child: Text(
+        'Made with ❤️ in Macedonia',
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
         ),
       ),
     );

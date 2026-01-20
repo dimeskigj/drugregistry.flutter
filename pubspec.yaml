@@ -50,6 +50,7 @@ flutter:
 
   assets:
     - assets/
+    - assets/icon/
 
 flutter_launcher_icons:
   android: "launcher_icon"

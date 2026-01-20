@@ -25,7 +25,7 @@ This privacy policy may be updated from time to time. Any changes will be posted
 
 If you have any questions or concerns about this privacy policy, please contact me at:
 
-Email: dimeskigj@gmail.com
+Email: contact@dimeski.net
 
 Thank you for using Registar na Lekovi.
 
@@ -65,7 +65,7 @@ Last revised on 16.07.2024
 
 Ако имаш прашања или грижи околу оваа политика за приватност, те молам контактирај ме на:
 
-Email: dimeskigj@gmail.com
+Email: contact@dimeski.com
 
 Фала што ја користиш Регистар на Лекови.
 

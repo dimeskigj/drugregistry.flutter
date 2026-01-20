@@ -126,12 +126,7 @@ class _PharmacySearchScreenState extends State<PharmacySearchScreen> {
                             _focusNode.unfocus();
 
                             Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder:
-                                    (_) => PharmacyDetailsScreen(
-                                      pharmacy: pharmacy,
-                                    ),
-                              ),
+                              PharmacyDetailsScreen.route(pharmacy: pharmacy),
                             );
                           },
                         ),

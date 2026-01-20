@@ -8,6 +8,12 @@ class PharmacyDetailsScreen extends StatelessWidget {
 
   final Pharmacy pharmacy;
 
+  static Route<void> route({required Pharmacy pharmacy}) {
+    return MaterialPageRoute(
+      builder: (context) => PharmacyDetailsScreen(pharmacy: pharmacy),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_drug_registry/core/extensions/issuing_type_extensions.dart';
 import 'package:flutter_drug_registry/core/models/drug.dart';
 import 'package:flutter_drug_registry/widgets/data_point_display.dart';
+import 'package:flutter_drug_registry/features/pdf_viewer/pdf_viewer_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -10,6 +11,12 @@ class DrugDetailsScreen extends StatelessWidget {
   const DrugDetailsScreen({super.key, required this.drug});
 
   final Drug drug;
+
+  static Route<void> route({required Drug drug}) {
+    return MaterialPageRoute(
+      builder: (context) => DrugDetailsScreen(drug: drug),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -191,7 +198,13 @@ class DrugDetailsScreen extends StatelessWidget {
             const SizedBox(height: 20),
             if (drug.manualUrl != null)
               InkWell(
-                onTap: () => launchUrl(drug.manualUrl!),
+                onTap:
+                    () => Navigator.of(context).push(
+                      PdfViewerScreen.route(
+                        title: 'Упатство за употреба',
+                        url: drug.manualUrl!,
+                      ),
+                    ),
                 child: Container(
                   margin: defaultInsets.copyWith(top: 10, bottom: 10),
                   child: Row(
@@ -208,7 +221,13 @@ class DrugDetailsScreen extends StatelessWidget {
               ),
             if (drug.reportUrl != null)
               InkWell(
-                onTap: () => launchUrl(drug.reportUrl!),
+                onTap:
+                    () => Navigator.of(context).push(
+                      PdfViewerScreen.route(
+                        title: 'Збирен извештај',
+                        url: drug.reportUrl!,
+                      ),
+                    ),
                 child: Container(
                   margin: defaultInsets.copyWith(top: 10, bottom: 10),
                   child: Row(

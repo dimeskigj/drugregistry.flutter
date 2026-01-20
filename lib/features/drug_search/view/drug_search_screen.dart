@@ -133,12 +133,7 @@ class _DrugSearchScreenState extends State<DrugSearchScreen> {
 
                             if (d.drugs.length == 1) {
                               Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder:
-                                      (_) => DrugDetailsScreen(
-                                        drug: d.drugs.first,
-                                      ),
-                                ),
+                                DrugDetailsScreen.route(drug: d.drugs.first),
                               );
                             }
                           },

@@ -18,13 +18,13 @@ class PharmacyDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     const defaultInsets = EdgeInsets.symmetric(horizontal: 20, vertical: 2);
+    final pharmacyName = pharmacy.name ?? 'Аптека';
 
-    var hasEmail = pharmacy.email != null && pharmacy.email!.length > 1;
-    var hasPhoneNumber =
-        pharmacy.phoneNumber != null && pharmacy.phoneNumber!.length > 1;
+    var hasEmail = (pharmacy.email?.length ?? 0) > 1;
+    var hasPhoneNumber = (pharmacy.phoneNumber?.length ?? 0) > 1;
 
     return Scaffold(
-      appBar: AppBar(toolbarHeight: 75, title: Text(pharmacy.name!)),
+      appBar: AppBar(toolbarHeight: 75, title: Text(pharmacyName)),
       backgroundColor: theme.colorScheme.surface,
       body: SingleChildScrollView(
         child: Column(
@@ -34,7 +34,7 @@ class PharmacyDetailsScreen extends StatelessWidget {
             Container(
               margin: defaultInsets,
               child: Text(
-                pharmacy.name!,
+                pharmacyName,
                 style: theme.textTheme.titleLarge?.copyWith(
                   color: theme.primaryColor,
                   fontWeight: FontWeight.bold,

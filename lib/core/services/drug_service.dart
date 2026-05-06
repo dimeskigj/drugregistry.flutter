@@ -22,7 +22,7 @@ class DrugService {
     };
     final url = Uri.https(
       Constants.baseApiUrl,
-      'api/drugs/search',
+      'api/v2/drugs/',
       queryParameters,
     );
 
@@ -34,19 +34,26 @@ class DrugService {
   }
 
   Future<List<Drug>> getDrugsByIds(List<String> ids) async {
-    final url = Uri.https(Constants.baseApiUrl, 'api/drugs/by-ids');
+    if (ids.isEmpty) {
+      return [];
+    }
 
-    final response = await http
-        .post(
-          url,
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode(ids),
-        )
-        .timeout(_timeOut);
+    final query = <String>[
+      'page=0',
+      'size=${ids.length}',
+      ...ids.map((id) => 'id=${Uri.encodeQueryComponent(id)}'),
+    ].join('&');
+    final url = Uri.https(
+      Constants.baseApiUrl,
+      'api/v2/drugs/',
+    ).replace(query: query);
+
+    final response = await http.get(url).timeout(_timeOut);
 
     response.ensureSuccessStatusCode();
-    final json = jsonDecode(response.body) as List<dynamic>;
-    return json.map((drugJson) => Drug.fromJson(drugJson)).toList();
+    final json = jsonDecode(response.body);
+    final results = PagedResult<Drug>.fromJson(json);
+    return results.data.toList();
   }
 
   Future<Drug?> getDrugByEan(String ean) async {

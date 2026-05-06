@@ -6,7 +6,8 @@ part 'paged_result.g.dart';
 
 @JsonSerializable(genericArgumentFactories: true)
 class PagedResult<T> {
-  final Iterable<T> data;
+  @JsonKey(defaultValue: <dynamic>[])
+  final List<T> data;
   final int totalCount;
   final int page;
   final int size;

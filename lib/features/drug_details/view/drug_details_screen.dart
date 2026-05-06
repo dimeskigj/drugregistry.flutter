@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_drug_registry/constants.dart';
 import 'package:flutter_drug_registry/core/extensions/issuing_type_extensions.dart';
 import 'package:flutter_drug_registry/core/models/drug.dart';
 import 'package:flutter_drug_registry/widgets/data_point_display.dart';
@@ -22,11 +23,17 @@ class DrugDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     const defaultInsets = EdgeInsets.symmetric(horizontal: 20, vertical: 2);
+    final latinName = drug.latinName ?? 'Непознат лек';
+    final registryUrl = drug.url ?? Uri.parse(Constants.lekoviUrl);
+    final lastUpdate =
+        drug.lastUpdate != null
+            ? DateFormat('yyyy/MM/dd').format(drug.lastUpdate!)
+            : 'непознат датум';
 
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 75,
-        title: Text(drug.latinName!),
+        title: Text(latinName),
         actions: [
           if (drug.url != null)
             IconButton(
@@ -41,17 +48,16 @@ class DrugDetailsScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (drug.latinName != null)
-              Container(
-                margin: defaultInsets,
-                child: Text(
-                  drug.latinName!,
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    color: theme.primaryColor,
-                    fontWeight: FontWeight.bold,
-                  ),
+            Container(
+              margin: defaultInsets,
+              child: Text(
+                latinName,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  color: theme.primaryColor,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
+            ),
             if (drug.genericName != null)
               Container(
                 margin: defaultInsets,
@@ -254,14 +260,13 @@ class DrugDetailsScreen extends StatelessWidget {
                       text: 'lekovi.zdravstvo.gov.mk',
                       recognizer:
                           TapGestureRecognizer()
-                            ..onTap = () => launchUrl(drug.url!),
+                            ..onTap = () => launchUrl(registryUrl),
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.primaryColor,
                       ),
                     ),
                     TextSpan(
-                      text:
-                          '. Овој лек е последно ажуриран на ${DateFormat('yyyy/MM/dd').format(drug.lastUpdate!)}.',
+                      text: '. Овој лек е последно ажуриран на $lastUpdate.',
                     ),
                   ],
                 ),

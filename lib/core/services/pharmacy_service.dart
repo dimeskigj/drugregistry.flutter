@@ -31,7 +31,7 @@ class PharmacyService {
 
     final url = Uri.https(
       Constants.baseApiUrl,
-      'api/pharmacies/search',
+      'api/v2/pharmacies/',
       queryParameters,
     );
 
@@ -65,7 +65,7 @@ class PharmacyService {
 
     final url = Uri.https(
       Constants.baseApiUrl,
-      'api/pharmacies/by-location',
+      'api/v2/pharmacies/',
       queryParameters,
     );
 
@@ -77,26 +77,33 @@ class PharmacyService {
   }
 
   Future<List<Pharmacy>> getPharmaciesByIds(List<String> ids) async {
-    final url = Uri.https(Constants.baseApiUrl, 'api/pharmacies/by-ids');
+    if (ids.isEmpty) {
+      return [];
+    }
 
-    final response = await http
-        .post(
-          url,
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode(ids),
-        )
-        .timeout(_timeOut);
+    final query = <String>[
+      'page=0',
+      'size=${ids.length}',
+      ...ids.map((id) => 'id=${Uri.encodeQueryComponent(id)}'),
+    ].join('&');
+    final url = Uri.https(
+      Constants.baseApiUrl,
+      'api/v2/pharmacies/',
+    ).replace(query: query);
+
+    final response = await http.get(url).timeout(_timeOut);
 
     response.ensureSuccessStatusCode();
 
-    final json = jsonDecode(response.body) as List<dynamic>;
-    return json.map((pharmacyJson) => Pharmacy.fromJson(pharmacyJson)).toList();
+    final json = jsonDecode(response.body);
+    final results = PagedResult<Pharmacy>.fromJson(json);
+    return results.data.toList();
   }
 
   Future<Iterable<String>> getMunicipalitiesByFrequency() async {
     final url = Uri.https(
       Constants.baseApiUrl,
-      'api/pharmacies/municipalities-by-frequency',
+      'api/v2/pharmacies/municipalities',
     );
 
     final response = await http.get(url).timeout(_timeOut);
@@ -107,12 +114,17 @@ class PharmacyService {
   }
 
   Future<Iterable<String>> getPlacesByFrequency(String municipality) async {
-    final queryParameters = {'municipality': municipality};
-
-    final url = Uri.https(
-      Constants.baseApiUrl,
-      'api/pharmacies/places-by-frequency',
-      queryParameters,
+    final url = Uri(
+      scheme: 'https',
+      host: Constants.baseApiUrl,
+      pathSegments: [
+        'api',
+        'v2',
+        'pharmacies',
+        'municipalities',
+        municipality,
+        'places',
+      ],
     );
 
     final response = await http.get(url).timeout(_timeOut);

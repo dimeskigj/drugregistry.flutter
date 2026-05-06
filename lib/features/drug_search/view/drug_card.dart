@@ -10,6 +10,14 @@ class DrugCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final latinName = drug.latinName ?? 'Непознат лек';
+    final genericName = drug.genericName ?? '';
+    final packagingDetails = [
+      drug.packaging,
+      drug.pharmaceuticalForm,
+    ].whereType<String>().where((value) => value.isNotEmpty).join(' ');
+    final manufacturer = drug.manufacturer ?? 'Непознат производител';
+
     return Card(
       key: Key(drug.id),
       elevation: 0,
@@ -38,28 +46,24 @@ class DrugCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          drug.latinName!,
-                          style: theme.textTheme.titleMedium,
-                        ),
-                        Text(
-                          drug.genericName!,
-                          style: theme.textTheme.titleSmall,
-                        ),
+                        Text(latinName, style: theme.textTheme.titleMedium),
+                        if (genericName.isNotEmpty)
+                          Text(genericName, style: theme.textTheme.titleSmall),
                       ],
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 6),
-              Divider(color: theme.colorScheme.onSurface.withValues(alpha: .2)),
-              const SizedBox(height: 6),
-              Text(
-                "${drug.packaging!} ${drug.pharmaceuticalForm!}",
-                style: theme.textTheme.labelMedium,
-              ),
+              if (packagingDetails.isNotEmpty) ...[
+                const SizedBox(height: 6),
+                Divider(
+                  color: theme.colorScheme.onSurface.withValues(alpha: .2),
+                ),
+                const SizedBox(height: 6),
+                Text(packagingDetails, style: theme.textTheme.labelMedium),
+              ],
               Container(height: 10),
-              Text(drug.manufacturer!, style: theme.textTheme.labelLarge),
+              Text(manufacturer, style: theme.textTheme.labelLarge),
             ],
           ),
         ),

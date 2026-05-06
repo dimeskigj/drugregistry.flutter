@@ -48,4 +48,18 @@ class DrugService {
     final json = jsonDecode(response.body) as List<dynamic>;
     return json.map((drugJson) => Drug.fromJson(drugJson)).toList();
   }
+
+  Future<Drug?> getDrugByEan(String ean) async {
+    final url = Uri.https(Constants.baseApiUrl, 'api/v2/drugs/ean/$ean');
+
+    final response = await http.get(url).timeout(_timeOut);
+
+    if (response.statusCode == 404) {
+      return null;
+    }
+
+    response.ensureSuccessStatusCode();
+    final json = jsonDecode(response.body);
+    return Drug.fromJson(json);
+  }
 }

@@ -44,7 +44,7 @@ android {
     defaultConfig {
         applicationId = "com.dimeskigj.drugregistry.flutter_drug_registry"
         minSdk = flutter.minSdkVersion
-        targetSdk = 35
+        targetSdk = flutter.targetSdkVersion
         versionCode = flutterVersionCode
         versionName = flutterVersionName
     }

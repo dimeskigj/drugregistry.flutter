@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_drug_registry/features/drug_details/view/drug_details_screen.dart';
 import 'package:flutter_drug_registry/features/drug_search/bloc/drug_search_bloc.dart';
 import 'package:flutter_drug_registry/features/drug_search/drug_search.dart';
+import 'package:flutter_drug_registry/features/drug_search/view/barcode_scanner_screen.dart';
 import 'package:flutter_drug_registry/features/drug_search/view/drug_card.dart';
 import 'package:flutter_drug_registry/features/drug_search/view/suggestion_list.dart';
 import 'package:flutter_drug_registry/widgets/suggestion_chips.dart';
@@ -46,6 +47,14 @@ class _DrugSearchScreenState extends State<DrugSearchScreen> {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).push(
+            BarcodeScannerScreen.route(),
+          );
+        },
+        child: const Icon(Icons.qr_code_scanner),
+      ),
       body: SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.max,
@@ -107,6 +116,16 @@ class _DrugSearchScreenState extends State<DrugSearchScreen> {
                           color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
+                      // trailing: [
+                      //   IconButton(
+                      //     onPressed: () {
+                      //       Navigator.of(context).push(
+                      //         BarcodeScannerScreen.route(),
+                      //       );
+                      //     },
+                      //     icon: const Icon(Icons.qr_code_scanner),
+                      //   ),
+                      // ],
                     ),
                   ),
                 );

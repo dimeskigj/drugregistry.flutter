@@ -49,5 +49,7 @@
 	<true/>
 	<key>NSLocationWhenInUseUsageDescription</key>
     <string>This app needs access to location when open to order pharmacies by their distance.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs camera access to scan drug barcodes.</string>
 </dict>
 </plist>

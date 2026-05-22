@@ -38,7 +38,7 @@ class InformationScreen extends StatelessWidget {
   Widget _buildHeader(ThemeData theme, ColorScheme colorScheme) {
     return Column(
       children: [
-        Container(
+        SizedBox(
           width: 96,
           height: 96,
           child: Image.asset('assets/icon/icon.png', fit: BoxFit.contain),
@@ -210,7 +210,7 @@ class InformationScreen extends StatelessWidget {
           colorScheme,
           label: 'Контактирајте нè',
           icon: Icons.mail_outline,
-          onTap: () => launchUrlString('mailto:contact@dimeski.net'),
+          onTap: () => launchUrlString('mailto:${Constants.contactEmail}'),
         ),
         const SizedBox(height: 12),
         _buildActionButton(

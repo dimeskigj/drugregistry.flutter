@@ -6,6 +6,7 @@ import 'package:flutter_drug_registry/features/drug_search/view/drug_search_scre
 import 'package:flutter_drug_registry/features/information/information.dart';
 import 'package:flutter_drug_registry/features/main/main.dart';
 import 'package:flutter_drug_registry/features/pharmacy_search/pharmacy_search.dart';
+import 'package:flutter_drug_registry/features/review_prompt/cubit/review_prompt_cubit.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class MainScreen extends StatefulWidget {
@@ -158,11 +159,15 @@ class MainScreenState extends State<MainScreen> {
                       icon: const Icon(Icons.launch),
                     ),
                     FilledButton.tonal(
-                      onPressed: () {
-                        context
-                            .read<MainScreenCubit>()
-                            .confirmFirstTimeDialog();
-                        Navigator.of(context).pop();
+                      onPressed: () async {
+                        final navigator = Navigator.of(context);
+                        final mainScreenCubit = context.read<MainScreenCubit>();
+                        final reviewPromptCubit =
+                            context.read<ReviewPromptCubit>();
+
+                        await mainScreenCubit.confirmFirstTimeDialog();
+                        reviewPromptCubit.refresh();
+                        navigator.pop();
                       },
                       child: const Text('Разбирам'),
                     ),

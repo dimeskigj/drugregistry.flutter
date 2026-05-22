@@ -5,6 +5,7 @@ import 'package:flutter_drug_registry/core/services/location_service.dart';
 import 'package:flutter_drug_registry/core/services/pharmacy_service.dart';
 import 'package:flutter_drug_registry/core/services/shared_preferences_service.dart';
 import 'package:flutter_drug_registry/features/main/main.dart';
+import 'package:flutter_drug_registry/features/review_prompt/cubit/review_prompt_cubit.dart';
 import 'package:flutter_drug_registry/observer.dart';
 import 'package:flutter_drug_registry/features/drug_details/cubit/drug_details_cubit.dart';
 import 'package:flutter_drug_registry/features/drug_search/bloc/drug_search_bloc.dart';
@@ -46,6 +47,12 @@ void main() async {
         BlocProvider<MainScreenCubit>(
           create:
               (_) => MainScreenCubit(GetIt.I.get<SharedPreferencesService>()),
+        ),
+        BlocProvider<ReviewPromptCubit>(
+          create:
+              (_) =>
+                  ReviewPromptCubit(GetIt.I.get<SharedPreferencesService>())
+                    ..refresh(),
         ),
       ],
       child: const MyApp(),

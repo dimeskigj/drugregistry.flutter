@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_drug_registry/core/models/pharmacy.dart';
+import 'package:flutter_drug_registry/features/review_prompt/cubit/review_prompt_cubit.dart';
 import 'package:flutter_drug_registry/widgets/data_point_display.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-class PharmacyDetailsScreen extends StatelessWidget {
+class PharmacyDetailsScreen extends StatefulWidget {
   const PharmacyDetailsScreen({super.key, required this.pharmacy});
 
   final Pharmacy pharmacy;
@@ -15,9 +17,21 @@ class PharmacyDetailsScreen extends StatelessWidget {
   }
 
   @override
+  State<PharmacyDetailsScreen> createState() => _PharmacyDetailsScreenState();
+}
+
+class _PharmacyDetailsScreenState extends State<PharmacyDetailsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<ReviewPromptCubit>().recordDetailView();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     const defaultInsets = EdgeInsets.symmetric(horizontal: 20, vertical: 2);
+    final pharmacy = widget.pharmacy;
     final pharmacyName = pharmacy.name ?? 'Аптека';
 
     var hasEmail = (pharmacy.email?.length ?? 0) > 1;

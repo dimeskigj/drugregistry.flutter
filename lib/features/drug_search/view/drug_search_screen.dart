@@ -6,6 +6,8 @@ import 'package:flutter_drug_registry/features/drug_search/drug_search.dart';
 import 'package:flutter_drug_registry/features/drug_search/view/barcode_scanner_screen.dart';
 import 'package:flutter_drug_registry/features/drug_search/view/drug_card.dart';
 import 'package:flutter_drug_registry/features/drug_search/view/suggestion_list.dart';
+import 'package:flutter_drug_registry/features/review_prompt/cubit/review_prompt_cubit.dart';
+import 'package:flutter_drug_registry/features/review_prompt/view/review_prompt_panel.dart';
 import 'package:flutter_drug_registry/widgets/suggestion_chips.dart';
 
 class DrugSearchScreen extends StatefulWidget {
@@ -37,8 +39,9 @@ class _DrugSearchScreenState extends State<DrugSearchScreen> {
 
   @override
   void initState() {
-    context.read<DrugSearchBloc>().add(DrugSearchInitialized());
     super.initState();
+    context.read<DrugSearchBloc>().add(DrugSearchInitialized());
+    context.read<ReviewPromptCubit>().refresh();
   }
 
   @override
@@ -49,9 +52,7 @@ class _DrugSearchScreenState extends State<DrugSearchScreen> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).push(
-            BarcodeScannerScreen.route(),
-          );
+          Navigator.of(context).push(BarcodeScannerScreen.route());
         },
         child: const Icon(Icons.qr_code_scanner),
       ),
@@ -249,16 +250,60 @@ class _DrugSearchScreenState extends State<DrugSearchScreen> {
                             ],
                           ),
                         ),
-                  DrugSearchInitial() => Container(
-                    margin: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-                    child: SuggestionChips(
-                      suggestions: suggestions,
-                      recentSearches: state.recentSearches,
-                      onSuggestionSelected: (suggestion) {
-                        drugSearchBloc.add(
-                          DrugSearchQuerySubmitted(query: suggestion),
+                  DrugSearchInitial() => Expanded(
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final minHeight =
+                            constraints.maxHeight > 36
+                                ? constraints.maxHeight - 36
+                                : 0.0;
+
+                        return SingleChildScrollView(
+                          padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(minHeight: minHeight),
+                            child: IntrinsicHeight(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  SuggestionChips(
+                                    suggestions: suggestions,
+                                    recentSearches: state.recentSearches,
+                                    onSuggestionSelected: (suggestion) {
+                                      drugSearchBloc.add(
+                                        DrugSearchQuerySubmitted(
+                                          query: suggestion,
+                                        ),
+                                      );
+                                      _searchController.text = suggestion;
+                                    },
+                                  ),
+                                  const Spacer(),
+                                  BlocBuilder<
+                                    ReviewPromptCubit,
+                                    ReviewPromptState
+                                  >(
+                                    builder: (context, state) {
+                                      if (!state.shouldShow) {
+                                        return const SizedBox.shrink();
+                                      }
+
+                                      final reviewPromptCubit =
+                                          context.read<ReviewPromptCubit>();
+
+                                      return ReviewPromptPanel(
+                                        onReview: reviewPromptCubit.openReview,
+                                        onFeedback:
+                                            reviewPromptCubit.sendFeedback,
+                                        onDismiss: reviewPromptCubit.dismiss,
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         );
-                        _searchController.text = suggestion;
                       },
                     ),
                   ),

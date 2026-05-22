@@ -1,14 +1,16 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_drug_registry/constants.dart';
 import 'package:flutter_drug_registry/core/extensions/issuing_type_extensions.dart';
 import 'package:flutter_drug_registry/core/models/drug.dart';
+import 'package:flutter_drug_registry/features/review_prompt/cubit/review_prompt_cubit.dart';
 import 'package:flutter_drug_registry/widgets/data_point_display.dart';
 import 'package:flutter_drug_registry/features/pdf_viewer/pdf_viewer_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class DrugDetailsScreen extends StatelessWidget {
+class DrugDetailsScreen extends StatefulWidget {
   const DrugDetailsScreen({super.key, required this.drug});
 
   final Drug drug;
@@ -20,9 +22,21 @@ class DrugDetailsScreen extends StatelessWidget {
   }
 
   @override
+  State<DrugDetailsScreen> createState() => _DrugDetailsScreenState();
+}
+
+class _DrugDetailsScreenState extends State<DrugDetailsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<ReviewPromptCubit>().recordDetailView();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     const defaultInsets = EdgeInsets.symmetric(horizontal: 20, vertical: 2);
+    final drug = widget.drug;
     final latinName = drug.latinName ?? 'Непознат лек';
     final registryUrl = drug.url ?? Uri.parse(Constants.lekoviUrl);
     final lastUpdate =

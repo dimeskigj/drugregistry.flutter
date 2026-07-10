@@ -1,7 +1,7 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_drug_registry/core/models/drug.dart';
 import 'package:flutter_drug_registry/core/models/drug_group.dart';
+import 'package:flutter_drug_registry/core/utils/drug_grouping.dart';
 
 class DrugSuggestionList extends StatelessWidget {
   const DrugSuggestionList({
@@ -17,7 +17,7 @@ class DrugSuggestionList extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
       children: [
-        ..._groupDrugs(drugs)
+        ...groupDrugsByType(drugs)
             .map(
               (d) => GestureDetector(
                 onTap: () => onTileTap(d),
@@ -40,34 +40,5 @@ class DrugSuggestionList extends StatelessWidget {
         Container(height: 300),
       ],
     );
-  }
-
-  List<DrugGroup> _groupDrugs(List<Drug> drugs) {
-    var orderedDrugs = Iterable.generate(
-      drugs.length,
-    ).map((index) => (index, drugs[index]));
-
-    var groupedDrugs = groupBy(
-      orderedDrugs,
-      (d) => (d.$2.genericName, d.$2.latinName),
-    );
-
-    return groupedDrugs.keys
-        .sorted(
-          (key1, key2) => (groupedDrugs[key1]?.first.$1 as int).compareTo(
-            groupedDrugs[key2]?.first.$1 as int,
-          ),
-        )
-        .map((key) => groupedDrugs[key]!.map((tuple) => tuple.$2))
-        .where((drugs) => drugs.isNotEmpty)
-        .map(
-          (drugs) => DrugGroup(
-            genericName: drugs.first.genericName ?? '',
-            latinName: drugs.first.latinName ?? '',
-            drugs: drugs.toList(),
-          ),
-        )
-        .where((groupedDrug) => groupedDrug.drugs.isNotEmpty)
-        .toList();
   }
 }

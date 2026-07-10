@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_drug_registry/core/models/pharmacy.dart';
 import 'package:flutter_drug_registry/core/services/pharmacy_service.dart';
@@ -15,7 +14,7 @@ class PharmacySearchBloc
     extends Bloc<PharmacySearchEvent, PharmacySearchState> {
   late final PharmacyService _pharmacyService;
   late final SharedPreferencesService _sharedPreferencesService;
-  String _lastQuery = '';
+  String _lastSearchKey = '';
   List<String> _recentSearches = [];
 
   PharmacySearchBloc(
@@ -42,8 +41,6 @@ class PharmacySearchBloc
     var sharedPreferencesRecentSearches =
         _sharedPreferencesService.getRecentPharmacySearches() ?? [];
 
-    if (sharedPreferencesRecentSearches.equals(_recentSearches)) return;
-
     _recentSearches = sharedPreferencesRecentSearches;
     emit(PharmacySearchInitial(recentSearches: _recentSearches));
   }
@@ -66,7 +63,8 @@ class PharmacySearchBloc
     PharmacySearchSuggestionTapped event,
     Emitter<PharmacySearchState> emit,
   ) {
-    emit(PharmacySearchLoadSuccess([event.pharmacy]));
+    final query = event.pharmacy.name ?? '';
+    emit(PharmacySearchLoadSuccess([event.pharmacy], query: query));
     updateRecentSearches(query: event.pharmacy.name?.toLowerCase() ?? '');
   }
 
@@ -76,23 +74,26 @@ class PharmacySearchBloc
     bool shouldReQuery = false,
   }) async {
     try {
-      if (_lastQuery == query && !shouldReQuery) return;
-      _lastQuery = query;
-
       if (query == '') {
-        emit(const PharmacySearchLoadSuccess([]));
+        _lastSearchKey = '';
+        emit(PharmacySearchInitial(recentSearches: _recentSearches));
         return;
       }
 
-      emit(PharmacySearchLoadInProgress());
+      final searchKey = query;
+
+      if (_lastSearchKey == searchKey && !shouldReQuery) return;
+      _lastSearchKey = searchKey;
+
+      emit(PharmacySearchLoadInProgress(query: query));
       var results = await _pharmacyService.searchPharmacies(query, size: 50);
-      emit(PharmacySearchLoadSuccess(results.data.toList()));
+      emit(PharmacySearchLoadSuccess(results.data.toList(), query: query));
 
       if (shouldReQuery && results.data.isNotEmpty) {
         await updateRecentSearches(query: query);
       }
     } catch (_) {
-      emit(PharmacySearchLoadFail());
+      emit(PharmacySearchLoadFail(query: query));
     }
   }
 

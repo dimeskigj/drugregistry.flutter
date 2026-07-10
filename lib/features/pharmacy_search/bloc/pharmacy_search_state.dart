@@ -16,15 +16,30 @@ final class PharmacySearchInitial extends PharmacySearchState {
   List<Object> get props => [recentSearches];
 }
 
-final class PharmacySearchLoadInProgress extends PharmacySearchState {}
+final class PharmacySearchLoadInProgress extends PharmacySearchState {
+  const PharmacySearchLoadInProgress({required this.query});
 
-final class PharmacySearchLoadFail extends PharmacySearchState {}
-
-final class PharmacySearchLoadSuccess extends PharmacySearchState {
-  const PharmacySearchLoadSuccess(this.pharmacies);
-
-  final List<Pharmacy> pharmacies;
+  final String query;
 
   @override
-  List<Object> get props => [pharmacies];
+  List<Object> get props => [query];
+}
+
+final class PharmacySearchLoadFail extends PharmacySearchState {
+  const PharmacySearchLoadFail({this.query = ''});
+
+  final String query;
+
+  @override
+  List<Object> get props => [query];
+}
+
+final class PharmacySearchLoadSuccess extends PharmacySearchState {
+  const PharmacySearchLoadSuccess(this.pharmacies, {this.query = ''});
+
+  final List<Pharmacy> pharmacies;
+  final String query;
+
+  @override
+  List<Object> get props => [pharmacies, query];
 }

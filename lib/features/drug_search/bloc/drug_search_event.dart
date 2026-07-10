@@ -36,6 +36,8 @@ class DrugSearchSuggestionTapped extends DrugSearchEvent {
   List<Object> get props => [drugGroup];
 }
 
+class DrugSearchGroupBackRequested extends DrugSearchEvent {}
+
 class DrugSearchDrugTapped extends DrugSearchEvent {
   const DrugSearchDrugTapped({required this.drug});
 

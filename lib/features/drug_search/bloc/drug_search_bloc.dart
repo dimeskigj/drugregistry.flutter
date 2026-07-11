@@ -33,6 +33,7 @@ class DrugSearchBloc extends Bloc<DrugSearchEvent, DrugSearchState> {
       transformer: debounce(const Duration(milliseconds: 300)),
     );
     on<DrugSearchSuggestionTapped>(_onDrugSearchSuggestionTapped);
+    on<DrugSearchGroupBackRequested>(_onDrugSearchGroupBackRequested);
   }
 
   Future<void> _onDrugSearchScreenInitialized(
@@ -72,19 +73,19 @@ class DrugSearchBloc extends Bloc<DrugSearchEvent, DrugSearchState> {
       _lastQuery = query;
 
       if (query == '') {
-        emit(const DrugSearchLoadSuccess(drugs: []));
+        emit(DrugSearchInitial(recentSearches: _recentSearches));
         return;
       }
 
-      emit(DrugSearchLoadInProgress());
+      emit(DrugSearchLoadInProgress(query: query));
       var results = await _drugService.searchDrugs(query, size: 50);
-      emit(DrugSearchLoadSuccess(drugs: results.data.toList()));
+      emit(DrugSearchLoadSuccess(drugs: results.data.toList(), query: query));
 
       if (shouldReQuery && results.data.isNotEmpty) {
         await updateRecentSearches(query: query);
       }
     } catch (_) {
-      emit(const DrugSearchLoadFail());
+      emit(DrugSearchLoadFail(query: query));
     }
   }
 
@@ -92,8 +93,40 @@ class DrugSearchBloc extends Bloc<DrugSearchEvent, DrugSearchState> {
     DrugSearchSuggestionTapped event,
     Emitter<DrugSearchState> emit,
   ) async {
-    emit(DrugSearchLoadSuccess(drugs: event.drugGroup.drugs));
+    if (event.drugGroup.drugs.length > 1) {
+      final previousState = state;
+      emit(
+        DrugSearchGroupSelected(
+          drugGroup: event.drugGroup,
+          previousDrugs:
+              previousState is DrugSearchLoadSuccess
+                  ? previousState.drugs
+                  : const [],
+          previousQuery:
+              previousState is DrugSearchLoadSuccess ? previousState.query : '',
+        ),
+      );
+    }
+
     await updateRecentSearches(query: event.drugGroup.latinName.toLowerCase());
+  }
+
+  void _onDrugSearchGroupBackRequested(
+    DrugSearchGroupBackRequested event,
+    Emitter<DrugSearchState> emit,
+  ) {
+    final currentState = state;
+    if (currentState is! DrugSearchGroupSelected ||
+        !currentState.canReturnToResults) {
+      return;
+    }
+
+    emit(
+      DrugSearchLoadSuccess(
+        drugs: currentState.previousDrugs,
+        query: currentState.previousQuery,
+      ),
+    );
   }
 
   Future<void> updateRecentSearches({String query = ''}) async {
